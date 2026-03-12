@@ -41,7 +41,7 @@
       REFERENCES ExpenseItems(Id) ON DELETE CASCADE
       );
 
-10)Фронтенд (Vue.js, опционально):
+10)Фронтенд (Vue.js):
         1.src/App.vue
         Главный компонент приложения.
         Содержит шапку, вкладки, формы и списки для всех сущностей.
@@ -61,6 +61,10 @@
 <img width="1298" height="900" alt="image" src="https://github.com/user-attachments/assets/95641e35-e711-4920-8bd0-af2083f73751" />
 <img width="892" height="848" alt="image" src="https://github.com/user-attachments/assets/47ba7a28-b642-4ee3-a3f2-8dc215f22731" />
 <img width="892" height="552" alt="image" src="https://github.com/user-attachments/assets/dece229f-c161-4d8c-8c28-864b2749f91f" />
+<img width="902" height="687" alt="image" src="https://github.com/user-attachments/assets/85ebb0c5-3974-4dc0-9bd1-fc617846c283" />
+<img width="893" height="863" alt="image" src="https://github.com/user-attachments/assets/eaf625d2-7cae-4143-9993-752006535187" />
+<img width="891" height="657" alt="image" src="https://github.com/user-attachments/assets/31b122c5-c4f6-4c6f-966d-1e91b2220b1d" />
+
 
 
 
