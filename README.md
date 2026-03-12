@@ -55,5 +55,7 @@
         5.src/components/TransactionList.vue
         Компонент для работы с транзакциями, фильтрация по дню/месяцу, визуализация стикеров.
 
+Скрины работы Swagger:
+<img width="1395" height="932" alt="image" src="https://github.com/user-attachments/assets/5e38509c-47fe-4d9f-b99d-d1076684cbad" />
 
       
