@@ -57,5 +57,11 @@
 
 Скрины работы Swagger:
 <img width="1395" height="932" alt="image" src="https://github.com/user-attachments/assets/5e38509c-47fe-4d9f-b99d-d1076684cbad" />
+<img width="1342" height="920" alt="image" src="https://github.com/user-attachments/assets/2193e263-dace-48c5-a452-be7d9219a04d" />
+<img width="1298" height="900" alt="image" src="https://github.com/user-attachments/assets/95641e35-e711-4920-8bd0-af2083f73751" />
+<img width="892" height="848" alt="image" src="https://github.com/user-attachments/assets/47ba7a28-b642-4ee3-a3f2-8dc215f22731" />
+<img width="892" height="552" alt="image" src="https://github.com/user-attachments/assets/dece229f-c161-4d8c-8c28-864b2749f91f" />
+
+
 
       
