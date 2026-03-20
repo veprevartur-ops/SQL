@@ -73,6 +73,11 @@
 <img width="908" height="866" alt="image" src="https://github.com/user-attachments/assets/1cb6b16a-9685-4927-9a05-bedef9602601" />
 <img width="911" height="486" alt="image" src="https://github.com/user-attachments/assets/f7621858-a9b7-4a01-a6d2-4b091d4fd68a" />
 
+Скрины работы Insomnia: 
+<img width="1590" height="902" alt="image" src="https://github.com/user-attachments/assets/1fdd4086-1300-4e60-8916-86cdae3a5594" />
+
+
+
 
 
 
