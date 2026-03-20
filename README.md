@@ -75,6 +75,10 @@
 
 Скрины работы Insomnia: 
 <img width="1590" height="902" alt="image" src="https://github.com/user-attachments/assets/1fdd4086-1300-4e60-8916-86cdae3a5594" />
+<img width="1592" height="907" alt="image" src="https://github.com/user-attachments/assets/9092d58d-9564-4324-b65b-6b0d9f8438ae" />
+<img width="1587" height="900" alt="image" src="https://github.com/user-attachments/assets/7d9141a2-0787-4726-ad8e-dbf8b52156da" />
+
+
 
 
 
