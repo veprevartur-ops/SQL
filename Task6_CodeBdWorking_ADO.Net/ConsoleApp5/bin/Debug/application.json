@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=NOTE-LEGION\\SQLEXPRESS;Database=InformaticsLessons;Trusted_Connection=True;"
+  }
+}
