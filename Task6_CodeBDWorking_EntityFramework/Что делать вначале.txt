@@ -1,0 +1,77 @@
+1)Создаем сначала Базу данных InformaticLessons
+CREATE DATABASE [InformaticLessons];
+GO
+
+2)Затем начинаем ее использовать
+USE [InformaticLessons];
+GO
+
+3)Создадим таблицы 
+
+CREATE TABLE [Group] (
+GroupID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+GroupName NVARCHAR(100) NOT NULL,
+IsActive BIT NOT NULL DEFAULT 1
+);
+
+-- Студент
+CREATE TABLE Student (
+StudentID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+FullName NVARCHAR(100) NOT NULL,
+BirthDate DATE,
+GPA DECIMAL(3,2),
+GroupID UNIQUEIDENTIFIER NOT NULL,
+IsActive BIT NOT NULL DEFAULT 1,
+FOREIGN KEY (GroupID) REFERENCES Group
+);
+
+-- Компьютерный класс
+CREATE TABLE Classroom (
+ClassroomID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+RoomName NVARCHAR(50) NOT NULL,
+Capacity INT,
+IsActive BIT NOT NULL DEFAULT 1
+);
+
+-- Компьютер
+CREATE TABLE Computer (
+ComputerID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+InventoryNumber NVARCHAR(50),
+Brand NVARCHAR(50),
+PurchaseDate DATETIME,
+Price DECIMAL(10,2),
+ClassroomID UNIQUEIDENTIFIER NOT NULL,
+IsActive BIT NOT NULL DEFAULT 1,
+FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
+);
+
+-- Занятие
+CREATE TABLE Lesson (
+LessonID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+Topic NVARCHAR(200),
+LessonDate DATETIME NOT NULL,
+ClassroomID UNIQUEIDENTIFIER NOT NULL,
+IsActive BIT NOT NULL DEFAULT 1,
+FOREIGN KEY (ClassroomID) REFERENCES Classroom(ClassroomID)
+);
+
+-- Связь N:N Студент-Занятие
+CREATE TABLE StudentLesson (
+StudentID UNIQUEIDENTIFIER NOT NULL,
+LessonID UNIQUEIDENTIFIER NOT NULL,
+Mark DECIMAL(4,2),
+IsPresent BIT,
+PRIMARY KEY (StudentID, LessonID),
+FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+FOREIGN KEY (LessonID) REFERENCES Lesson(LessonID)
+);
+
+-- Связь N:N Компьютер-Занятие
+CREATE TABLE ComputerLesson (
+ComputerID UNIQUEIDENTIFIER NOT NULL,
+LessonID UNIQUEIDENTIFIER NOT NULL,
+IsUsed BIT,
+PRIMARY KEY (ComputerID, LessonID),
+FOREIGN KEY (ComputerID) REFERENCES Computer(ComputerID),
+FOREIGN KEY (LessonID) REFERENCES Lesson(LessonID)
+);
