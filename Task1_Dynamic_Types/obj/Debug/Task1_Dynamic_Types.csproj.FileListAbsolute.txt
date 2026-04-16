@@ -1,7 +1,0 @@
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\bin\Debug\Task1_Dynamic_Types.exe.config
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\bin\Debug\Task1_Dynamic_Types.exe
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\bin\Debug\Task1_Dynamic_Types.pdb
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\obj\Debug\Task1_Dynamic_Types.csproj.AssemblyReference.cache
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\obj\Debug\Task1_Dynamic_Types.csproj.CoreCompileInputs.cache
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\obj\Debug\Task1_Dynamic_Types.exe
-C:\Users\Артур\source\repos\Task1_Dynamic_Types\obj\Debug\Task1_Dynamic_Types.pdb
