@@ -1,4 +1,6 @@
-// Создание базы данных
+/* 
+   Создание базы данных
+*/
 
 CREATE DATABASE InformaticsLessons;
 GO
@@ -6,9 +8,13 @@ GO
 USE InformaticsLessons;
 GO
 
-// Создание таблиц
+/* 
+   Создание таблиц
+*/
 
-// Группа
+/* 
+   Группа
+*/
 CREATE TABLE [Group]
 (
     GroupID     UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -16,7 +22,9 @@ CREATE TABLE [Group]
     IsActive    BIT NOT NULL DEFAULT 1
 );
 
-// Студент
+/* 
+   Студент
+*/
 CREATE TABLE [Student]
 (
     StudentID   UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -28,7 +36,9 @@ CREATE TABLE [Student]
     FOREIGN KEY (GroupID) REFERENCES [Group](GroupID)
 );
 
-// Компьютерный класс
+/* 
+   Компьютерный класс
+*/
 CREATE TABLE [Classroom]
 (
     ClassroomID UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -37,7 +47,9 @@ CREATE TABLE [Classroom]
     IsActive    BIT NOT NULL DEFAULT 1
 );
 
-// Компьютер
+/* 
+   Компьютер
+*/
 CREATE TABLE [Computer]
 (
     ComputerID      UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -50,7 +62,9 @@ CREATE TABLE [Computer]
     FOREIGN KEY (ClassroomID) REFERENCES [Classroom](ClassroomID)
 );
 
-// Занятие
+/* 
+   Занятие
+*/
 CREATE TABLE [Lesson]
 (
     LessonID    UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
@@ -61,7 +75,9 @@ CREATE TABLE [Lesson]
     FOREIGN KEY (ClassroomID) REFERENCES [Classroom](ClassroomID)
 );
 
-// Связь Студент — Занятие
+/* 
+   Связь Студент — Занятие
+*/
 CREATE TABLE [StudentLesson]
 (
     StudentID   UNIQUEIDENTIFIER NOT NULL,
@@ -73,7 +89,9 @@ CREATE TABLE [StudentLesson]
     FOREIGN KEY (LessonID)  REFERENCES [Lesson](LessonID)
 );
 
-// Связь Компьютер — Занятие
+/* 
+   Связь Компьютер — Занятие
+*/
 CREATE TABLE [ComputerLesson]
 (
     ComputerID  UNIQUEIDENTIFIER NOT NULL,
@@ -84,7 +102,9 @@ CREATE TABLE [ComputerLesson]
     FOREIGN KEY (LessonID)   REFERENCES [Lesson](LessonID)
 );
 
-// Вставка тестовых данных
+/* 
+   Вставка тестовых данных
+*/
 
 INSERT INTO [Group] (GroupID, GroupName, IsActive)
 VALUES 
@@ -189,9 +209,13 @@ VALUES
         FROM [Lesson] 
         WHERE Topic = N'Компьютерные сети'), 0);
 
-// Работа с данными
+/* 
+   Работа с данными
+*/
 
-// Все активные студенты из групп ПИ-101 и ПИ-102
+/* 
+   Все активные студенты из групп ПИ-101 и ПИ-102
+*/
 SELECT TOP 50
      s.FullName
     ,s.BirthDate
@@ -206,7 +230,9 @@ WHERE
 ORDER BY 
     s.FullName;
 
-// Удаление записей неактивных студентов
+/* 
+   Удаление записей неактивных студентов
+*/
 DELETE 
 FROM 
     [StudentLesson]
@@ -222,7 +248,9 @@ FROM
 WHERE 
     IsActive = 0;
 
-// Изменить оценку студента
+/* 
+   Изменить оценку студента
+*/
 UPDATE 
     [StudentLesson]
 SET 
@@ -235,7 +263,9 @@ WHERE
                     FROM [Lesson] 
                     WHERE Topic = N'Основы программирования');
 
-// Средний балл по каждой группе
+/* 
+   Средний балл по каждой группе
+*/
 SELECT TOP 50
     g.GroupName,
     AVG(s.GPA) AS AvgGPA
@@ -248,7 +278,9 @@ GROUP BY
 ORDER BY 
     AvgGPA DESC;
 
-// Все студенты и их оценки на занятиях
+/* 
+   Все студенты и их оценки на занятиях
+*/
 SELECT 
     s.FullName,
     l.Topic,
@@ -262,7 +294,9 @@ LEFT JOIN
 ORDER BY 
     s.FullName, l.LessonDate;
 
-// Все занятия и студенты, которые их посещали
+/* 
+   Все занятия и студенты, которые их посещали
+*/
 SELECT TOP 50
     l.Topic,
     l.LessonDate,
@@ -276,7 +310,9 @@ RIGHT JOIN
 ORDER BY 
     l.LessonDate, s.FullName;
 
-// Студенты, получившие оценку выше 4
+/* 
+   Студенты, получившие оценку выше 4
+*/
 SELECT TOP 50
     s.FullName,
     l.Topic,
