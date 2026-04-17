@@ -209,30 +209,30 @@ ORDER BY
 // Удаление записей неактивных студентов
 DELETE 
 FROM 
-    StudentLesson
+    [StudentLesson]
 WHERE 
     StudentID IN 
         (SELECT StudentID 
-         FROM Student 
+         FROM [Student] 
          WHERE IsActive = 0);
 
 DELETE 
 FROM 
-    Student
+    [Student]
 WHERE 
     IsActive = 0;
 
 // Изменить оценку студента
 UPDATE 
-    StudentLesson
+    [StudentLesson]
 SET 
     Mark = 5.00
 WHERE 
     StudentID = (SELECT TOP 1 StudentID 
-                 FROM Student 
+                 FROM [Student] 
                  WHERE FullName = N'Иванов Иван Иванович')
     AND LessonID = (SELECT TOP 1 LessonID 
-                    FROM Lesson 
+                    FROM [Lesson] 
                     WHERE Topic = N'Основы программирования');
 
 // Средний балл по каждой группе
@@ -240,7 +240,7 @@ SELECT
     g.GroupName,
     AVG(s.GPA) AS AvgGPA
 FROM 
-    Student s
+    [Student] s
 JOIN 
     [Group] g ON s.GroupID = g.GroupID
 GROUP BY 
@@ -254,11 +254,11 @@ SELECT
     l.Topic,
     sl.Mark
 FROM 
-    Student s
+    [Student] s
 LEFT JOIN 
-    StudentLesson sl ON s.StudentID = sl.StudentID
+    [StudentLesson] sl ON s.StudentID = sl.StudentID
 LEFT JOIN 
-    Lesson l ON sl.LessonID = l.LessonID
+    [Lesson] l ON sl.LessonID = l.LessonID
 ORDER BY 
     s.FullName, l.LessonDate;
 
@@ -268,11 +268,11 @@ SELECT
     l.LessonDate,
     s.FullName
 FROM 
-    Lesson l
+    [Lesson] l
 RIGHT JOIN 
-    StudentLesson sl ON l.LessonID = sl.LessonID
+    [StudentLesson] sl ON l.LessonID = sl.LessonID
 RIGHT JOIN 
-    Student s ON sl.StudentID = s.StudentID
+    [Student] s ON sl.StudentID = s.StudentID
 ORDER BY 
     l.LessonDate, s.FullName;
 
@@ -282,11 +282,11 @@ SELECT
     l.Topic,
     sl.Mark
 FROM 
-    Student s
+    [Student] s
 INNER JOIN 
-    StudentLesson sl ON s.StudentID = sl.StudentID
+    [StudentLesson] sl ON s.StudentID = sl.StudentID
 INNER JOIN 
-    Lesson l ON sl.LessonID = l.LessonID
+    [Lesson] l ON sl.LessonID = l.LessonID
 WHERE 
     sl.Mark > 4
 ORDER BY 
