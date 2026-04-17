@@ -192,7 +192,7 @@ VALUES
 // Работа с данными
 
 // Все активные студенты из групп ПИ-101 и ПИ-102
-SELECT 
+SELECT TOP 50
      s.FullName
     ,s.BirthDate
     ,s.GPA
@@ -236,7 +236,7 @@ WHERE
                     WHERE Topic = N'Основы программирования');
 
 // Средний балл по каждой группе
-SELECT 
+SELECT TOP 50
     g.GroupName,
     AVG(s.GPA) AS AvgGPA
 FROM 
@@ -263,7 +263,7 @@ ORDER BY
     s.FullName, l.LessonDate;
 
 // Все занятия и студенты, которые их посещали
-SELECT 
+SELECT TOP 50
     l.Topic,
     l.LessonDate,
     s.FullName
@@ -277,7 +277,7 @@ ORDER BY
     l.LessonDate, s.FullName;
 
 // Студенты, получившие оценку выше 4
-SELECT 
+SELECT TOP 50
     s.FullName,
     l.Topic,
     sl.Mark
