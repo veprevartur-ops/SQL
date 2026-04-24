@@ -4,89 +4,99 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the Computer table.
+    /// Репозиторий для работы с таблицей компьютеров.
     /// </summary>
-    public class ComputerRepository
+    public class ComputerRepository : RepositoryBase<Computer>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ComputerRepository"/> class.
+        /// Конструктор репозитория компьютеров.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public ComputerRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a new computer.
+        /// Добавление нового компьютера.
         /// </summary>
-        /// <param name="computer">The computer to add.</param>
-        public void Create(Computer computer)
+        /// <param name="computer">Компьютер для добавления.</param>
+        public override void Create(Computer computer)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the computer to the context.
                 db.Computers.Add(computer);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all computers.
+        /// Получение списка всех компьютеров.
         /// </summary>
-        /// <returns>List of computers.</returns>
-        public List<Computer> GetAll()
+        /// <returns>Список компьютеров.</returns>
+        public override List<Computer> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all computers as a list.
                 return new List<Computer>(db.Computers);
             }
         }
 
         /// <summary>
-        /// Updates an existing computer.
+        /// Обновление существующего компьютера.
         /// </summary>
-        /// <param name="computer">The computer to update.</param>
-        public void Update(Computer computer)
+        /// <param name="computer">Компьютер для обновления.</param>
+        public override void Update(Computer computer)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the computer in the context.
                 db.Computers.Update(computer);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a computer by its identifier.
+        /// Удаление компьютера по идентификатору.
         /// </summary>
-        /// <param name="computerId">The computer identifier.</param>
-        public void Delete(Guid computerId)
+        /// <param name="computerId">Идентификатор компьютера.</param>
+        public override void Delete(Guid computerId, Guid id2 = default)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the computer by ID.
                 var computer = db.Computers.Find(computerId);
-
-                // If the computer exists, remove it.
                 if (computer != null)
                 {
                     db.Computers.Remove(computer);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Строковое представление компьютера.
+        /// </summary>
+        /// <param name="computer">Компьютер.</param>
+        /// <returns>Строка с параметрами компьютера.</returns>
+        public override string ToString(Computer computer)
+        {
+            return $"{computer.ComputerID}\t{computer.InventoryNumber}\t{computer.Brand}\t" +
+                   $"{(computer.PurchaseDate.HasValue ? computer.PurchaseDate.Value.ToShortDateString() : "")}\t" +
+                   $"{(computer.Price.HasValue ? computer.Price.Value.ToString("0.00") : "")}\t" +
+                   $"{computer.ClassroomID}\t{(computer.IsActive ? "Активен" : "Неактивен")}";
+        }
+
+        /// <summary>
+        /// Вывод в консоль всех компьютеров.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("ComputerID\tInventoryNumber\tBrand\tPurchaseDate\tPrice\tClassroomID\tStatus");
+            foreach (var computer in list)
+            {
+                Console.WriteLine(ToString(computer));
             }
         }
     }

@@ -11,16 +11,8 @@ namespace ConsoleAdoDatabase
     {
         private readonly string _connectionString;
 
-        /// <summary>
-        /// Создаёт новый экземпляр репозитория групп.
-        /// </summary>
-        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public GroupRepository(string connectionString) => _connectionString = connectionString;
 
-        /// <summary>
-        /// Добавляет новую группу в базу данных.
-        /// </summary>
-        /// <param name="group">Группа для добавления.</param>
         public override void Create(Group group)
         {
             using (var conn = new SqlConnection(_connectionString))
@@ -51,10 +43,6 @@ namespace ConsoleAdoDatabase
             }
         }
 
-        /// <summary>
-        /// Получает список всех групп.
-        /// </summary>
-        /// <returns>Список групп.</returns>
         public override List<Group> GetAll()
         {
             var groups = new List<Group>();
@@ -65,7 +53,6 @@ namespace ConsoleAdoDatabase
                     "SELECT GroupID, GroupName, IsActive FROM [Group]", conn))
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("GroupID\tGroupName\tIsActive");
                     while (reader.Read())
                     {
                         var group = new Group
@@ -75,10 +62,6 @@ namespace ConsoleAdoDatabase
                             IsActive = (bool)reader["IsActive"]
                         };
                         groups.Add(group);
-
-                        // Печать содержимого строки
-                        Console.WriteLine($"{group.GroupID}\t{group.GroupName}\t{group.IsActive}");
-                        Console.WriteLine();
                     }
                 }
             }
@@ -86,28 +69,20 @@ namespace ConsoleAdoDatabase
         }
 
 
-        /// <summary>
-        /// Обновляет данные группы.
-        /// </summary>
-        /// <param name="group">Группа для обновления.</param>
         public override void Update(Group group)
         {
-            // Открываем соединение с базой данных.
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                // Готовим SQL-команду для обновления группы.
                 using (var cmd = new SqlCommand(
                     "UPDATE [Group] " +
-                    "SET GroupName = @GroupName, IsActive = @IsActive" +
+                    "SET GroupName = @GroupName, IsActive = @IsActive " +
                     "WHERE GroupID = @GroupID", conn))
                 {
                     cmd.Parameters.AddWithValue("@GroupID", group.GroupID);
                     cmd.Parameters.AddWithValue("@GroupName", group.GroupName);
                     cmd.Parameters.AddWithValue("@IsActive", group.IsActive);
 
-                    // Выполняем команду.
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -124,31 +99,45 @@ namespace ConsoleAdoDatabase
             }
         }
 
-        /// <summary>
-        /// Удаляет группу по идентификатору.
-        /// </summary>
-        /// <param name="groupId">Идентификатор группы.</param>
         public override void Delete(Guid groupId, Guid id2 = default)
         {
-            // Открываем соединение с базой данных.
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                // Готовим SQL-команду для удаления группы.
                 using (var cmd = new SqlCommand(
-                    "DELETE FROM [Group]" +
-                    "WHERE GroupID = @GroupID", conn))
+                    "DELETE FROM [Group] WHERE GroupID = @GroupID", conn))
                 {
                     cmd.Parameters.AddWithValue("@GroupID", groupId);
 
-                    // Выполняем команду.
                     int affected = cmd.ExecuteNonQuery();
                     if (affected == 0)
                     {
                         throw new InvalidOperationException("Удаление не выполнено: запись с таким ключом не найдена.");
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Возвращает строковое представление группы.
+        /// </summary>
+        /// <param name="group">Экземпляр группы.</param>
+        /// <returns>Строка для вывода.</returns>
+        public override string ToString(Group group)
+        {
+            return $"{group.GroupID}\t{group.GroupName}\t{(group.IsActive ? "Активна" : "Неактивна")}";
+        }
+
+        /// <summary>
+        /// Вывод в консоль всех групп из таблицы Group.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var all = GetAll();
+            Console.WriteLine("GroupID\t\t\t\t\tGroupName\tIsActive");
+            foreach (var group in all)
+            {
+                Console.WriteLine(ToString(group));
             }
         }
     }

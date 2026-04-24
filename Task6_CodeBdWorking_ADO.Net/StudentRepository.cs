@@ -11,16 +11,8 @@ namespace ConsoleAdoDatabase
     {
         private readonly string _connectionString;
 
-        /// <summary>
-        /// Создаёт новый экземпляр репозитория студентов.
-        /// </summary>
-        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public StudentRepository(string connectionString) => _connectionString = connectionString;
 
-        /// <summary>
-        /// Добавляет нового студента в базу данных.
-        /// </summary>
-        /// <param name="student">Студент для добавления.</param>
         public override void Create(Student student)
         {
             using (var conn = new SqlConnection(_connectionString))
@@ -54,10 +46,6 @@ namespace ConsoleAdoDatabase
             }
         }
 
-        /// <summary>
-        /// Получает список всех студентов.
-        /// </summary>
-        /// <returns>Список студентов.</returns>
         public override List<Student> GetAll()
         {
             var students = new List<Student>();
@@ -68,47 +56,29 @@ namespace ConsoleAdoDatabase
                     "SELECT StudentID, FullName, BirthDate, GPA, GroupID, IsActive FROM Student", conn))
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("StudentID\tFullName\tBirthDate\tGPA\tGroupID\tIsActive");
                     while (reader.Read())
                     {
                         var student = new Student
                         {
                             StudentID = (Guid)reader["StudentID"],
                             FullName = (string)reader["FullName"],
-                            BirthDate = reader["BirthDate"] == DBNull.Value
-                                ? null
-                                : (DateTime?)reader["BirthDate"],
-                            GPA = reader["GPA"] == DBNull.Value
-                                ? null
-                                : (decimal?)reader["GPA"],
+                            BirthDate = reader["BirthDate"] == DBNull.Value ? null : (DateTime?)reader["BirthDate"],
+                            GPA = reader["GPA"] == DBNull.Value ? null : (decimal?)reader["GPA"],
                             GroupID = (Guid)reader["GroupID"],
                             IsActive = (bool)reader["IsActive"]
                         };
                         students.Add(student);
-
-                        string birthDate = student.BirthDate.HasValue ? student.BirthDate.Value.ToShortDateString() : "";
-                        string gpa = student.GPA.HasValue ? student.GPA.Value.ToString("0.00") : "";
-
-                        Console.WriteLine($"{student.StudentID}\t{student.FullName}\t{birthDate}\t{gpa}\t{student.GroupID}\t{student.IsActive}");
-                        Console.WriteLine();
                     }
                 }
             }
             return students;
         }
 
-        /// <summary>
-        /// Обновляет данные студента.
-        /// </summary>
-        /// <param name="student">Студент для обновления.</param>
         public override void Update(Student student)
         {
-            // Открываем соединение с базой данных.
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                // Готовим SQL-команду для обновления студента.
                 using (var cmd = new SqlCommand(
                     "UPDATE Student " +
                     "SET FullName = @FullName, BirthDate = @BirthDate, GPA = @GPA, GroupID = @GroupID, IsActive = @IsActive " +
@@ -121,7 +91,6 @@ namespace ConsoleAdoDatabase
                     cmd.Parameters.AddWithValue("@GroupID", student.GroupID);
                     cmd.Parameters.AddWithValue("@IsActive", student.IsActive);
 
-                    // Выполняем команду.
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -138,17 +107,11 @@ namespace ConsoleAdoDatabase
             }
         }
 
-        /// <summary>
-        /// Удаляет студента по идентификатору.
-        /// </summary>
-        /// <param name="studentId">Идентификатор студента.</param>
         public override void Delete(Guid studentId, Guid id2 = default)
         {
-            // id2 игнорируется, потому что для Student нужен только один идентификатор
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
                 using (var cmd = new SqlCommand(
                     "DELETE FROM Student " +
                     "WHERE StudentID = @StudentID", conn))
@@ -161,6 +124,31 @@ namespace ConsoleAdoDatabase
                         throw new InvalidOperationException("Удаление не выполнено: запись с таким ключом не найдена.");
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Возвращает строковое представление студента.
+        /// </summary>
+        /// <param name="student">Экземпляр студента.</param>
+        /// <returns>Строка для вывода.</returns>
+        public override string ToString(Student student)
+        {
+            string birthDate = student.BirthDate.HasValue ? student.BirthDate.Value.ToShortDateString() : "";
+            string gpa = student.GPA.HasValue ? student.GPA.Value.ToString("0.00") : "";
+            return $"{student.StudentID}\t{student.FullName}\t{birthDate}\t{gpa}\t{student.GroupID}\t{(student.IsActive ? "Активен" : "Неактивен")}";
+        }
+
+        /// <summary>
+        /// Вывод в консоль всех студентов из таблицы Student.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var all = GetAll();
+            Console.WriteLine("StudentID\t\t\tFullName\tBirthDate\tGPA\tGroupID\t\t\t\tIsActive");
+            foreach (var student in all)
+            {
+                Console.WriteLine(ToString(student));
             }
         }
     }

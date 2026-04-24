@@ -3,33 +3,43 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents a lesson.
+    /// Занятие.
     /// </summary>
-    public class Lesson
+    public class Lesson : IUpdateble<Lesson>
     {
         /// <summary>
-        /// Gets or sets the unique lesson identifier.
+        /// Уникальный идентификатор занятия.
         /// </summary>
         public Guid LessonID { get; set; }
 
         /// <summary>
-        /// Gets or sets the topic of the lesson.
+        /// Тема занятия.
         /// </summary>
         public string Topic { get; set; }
 
         /// <summary>
-        /// Gets or sets the lesson date.
+        /// Дата занятия.
         /// </summary>
         public DateTime LessonDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the classroom identifier.
+        /// Идентификатор класса.
         /// </summary>
         public Guid ClassroomID { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the lesson is active.
+        /// Признак активности.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление темы занятия.
+        /// </summary>
+        /// <param name="entity">Занятие со старой темой.</param>
+        public void Update(Lesson entity)
+        {
+            Topic += " Updated";
+            LessonDate = LessonDate.AddDays(1);
+        }
     }
 }

@@ -3,23 +3,32 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents a student group.
+    /// Учебная группа.
     /// </summary>
-    public class Group
+    public class Group : IUpdateble<Group>
     {
         /// <summary>
-        /// Gets or sets the unique group identifier.
+        /// Уникальный идентификатор группы.
         /// </summary>
         public Guid GroupID { get; set; }
 
         /// <summary>
-        /// Gets or sets the group name.
+        /// Название группы.
         /// </summary>
         public string GroupName { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the group is active.
+        /// Признак активности группы.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление названия группы.
+        /// </summary>
+        /// <param name="entity">Группа с новым названием.</param>
+        public void Update(Group entity)
+        {
+            GroupName += " Updated";
+        }
     }
 }

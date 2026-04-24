@@ -4,89 +4,96 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the Group table.
+    /// Репозиторий для работы с таблицей групп.
     /// </summary>
-    public class GroupRepository
+    public class GroupRepository : RepositoryBase<Group>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GroupRepository"/> class.
+        /// Конструктор репозитория групп.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public GroupRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a new group.
+        /// Добавление новой группы.
         /// </summary>
-        /// <param name="group">The group to add.</param>
-        public void Create(Group group)
+        /// <param name="group">Группа для добавления.</param>
+        public override void Create(Group group)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the group to the context.
                 db.Groups.Add(group);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all groups.
+        /// Получение списка всех групп.
         /// </summary>
-        /// <returns>List of groups.</returns>
-        public List<Group> GetAll()
+        /// <returns>Список групп.</returns>
+        public override List<Group> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all groups as a list.
                 return new List<Group>(db.Groups);
             }
         }
 
         /// <summary>
-        /// Updates an existing group.
+        /// Обновление существующей группы.
         /// </summary>
-        /// <param name="group">The group to update.</param>
-        public void Update(Group group)
+        /// <param name="group">Группа для обновления.</param>
+        public override void Update(Group group)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the group in the context.
                 db.Groups.Update(group);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a group by its identifier.
+        /// Удаление группы по идентификатору.
         /// </summary>
-        /// <param name="groupId">The group identifier.</param>
-        public void Delete(Guid groupId)
+        /// <param name="groupId">Идентификатор группы.</param>
+        public override void Delete(Guid groupId, Guid id2 = default)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the group by ID.
                 var group = db.Groups.Find(groupId);
-
-                // If the group exists, remove it.
                 if (group != null)
                 {
                     db.Groups.Remove(group);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Строковое представление группы.
+        /// </summary>
+        /// <param name="group">Группа.</param>
+        /// <returns>Строка с информацией о группе.</returns>
+        public override string ToString(Group group)
+        {
+            return $"{group.GroupID}\t{group.GroupName}\t{(group.IsActive ? "Активна" : "Неактивна")}";
+        }
+
+        /// <summary>
+        /// Вывод всех групп в консоль.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("GroupID\t\t\t\t\tGroupName\tStatus");
+            foreach (var group in list)
+            {
+                Console.WriteLine(ToString(group));
             }
         }
     }

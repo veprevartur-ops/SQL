@@ -3,28 +3,37 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents a classroom.
+    /// Компьютерный класс.
     /// </summary>
-    public class Classroom
+    public class Classroom : IUpdateble<Classroom>
     {
         /// <summary>
-        /// Gets or sets the unique classroom identifier.
+        /// Уникальный идентификатор класса.
         /// </summary>
         public Guid ClassroomID { get; set; }
 
         /// <summary>
-        /// Gets or sets the room name.
+        /// Название класса.
         /// </summary>
         public string RoomName { get; set; }
 
         /// <summary>
-        /// Gets or sets the capacity of the classroom.
+        /// Вместимость класса.
         /// </summary>
         public int? Capacity { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the classroom is active.
+        /// Признак активности.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление названия класса.
+        /// </summary>
+        /// <param name="entity">Класс со старым названием.</param>
+        public void Update(Classroom entity)
+        {
+            RoomName += " Updated";
+        }
     }
 }

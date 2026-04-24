@@ -76,6 +76,7 @@
     <Compile Include="ComputerRepository.cs" />
     <Compile Include="Group.cs" />
     <Compile Include="GroupRepository.cs" />
+    <Compile Include="IUpdateble.cs" />
     <Compile Include="Lesson.cs" />
     <Compile Include="LessonRepository.cs" />
     <Compile Include="Program.cs" />

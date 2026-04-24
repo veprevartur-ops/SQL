@@ -3,23 +3,52 @@
 namespace ConsoleAdoDatabase
 {
     /// <summary>
-    /// Представляет компьютер.
+    /// Компьютер.
     /// </summary>
-    public class Computer
+    public class Computer : IUpdateble<Computer>
     {
-        /// <summary>Уникальный идентификатор компьютера.</summary>
+        /// <summary>
+        /// Уникальный идентификатор компьютера.
+        /// </summary>
         public Guid ComputerID { get; set; }
-        /// <summary>Инвентарный номер.</summary>
+
+        /// <summary>
+        /// Инвентарный номер.
+        /// </summary>
         public string InventoryNumber { get; set; }
-        /// <summary>Бренд компьютера.</summary>
+
+        /// <summary>
+        /// Бренд компьютера.
+        /// </summary>
         public string Brand { get; set; }
-        /// <summary>Дата покупки.</summary>
+
+        /// <summary>
+        /// Дата покупки.
+        /// </summary>
         public DateTime? PurchaseDate { get; set; }
-        /// <summary>Цена.</summary>
+
+        /// <summary>
+        /// Цена.
+        /// </summary>
         public decimal? Price { get; set; }
-        /// <summary>Идентификатор класса.</summary>
+
+        /// <summary>
+        /// Идентификатор класса.
+        /// </summary>
         public Guid ClassroomID { get; set; }
-        /// <summary>Признак активности.</summary>
+
+        /// <summary>
+        /// Признак активности.
+        /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление бренда компьютера.
+        /// </summary>
+        /// <param name="entity">Компьютер со старым брендом.</param>
+        public void Update(Computer entity)
+        {
+            Brand += " Updated";
+        }
     }
 }

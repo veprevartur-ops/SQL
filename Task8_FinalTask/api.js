@@ -21,3 +21,4 @@ export const updateTransaction = (id, transaction) => axios.put(`${API}/ExpenseT
 export const deleteTransaction = id => axios.delete(`${API}/ExpenseTransactions/${id}`);
 export const getTransactionsByDay = date => axios.get(`${API}/ExpenseTransactions/byday/${date}`);
 export const getTransactionsByMonth = (year, month) => axios.get(`${API}/ExpenseTransactions/bymonth/${year}/${month}`);
+export const getDaySticker = date => axios.get(`${API}/ExpenseTransactions/sticker/${date}`);

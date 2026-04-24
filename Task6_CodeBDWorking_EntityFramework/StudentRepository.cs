@@ -4,89 +4,98 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the Student table.
+    /// Репозиторий для работы с таблицей студентов.
     /// </summary>
-    public class StudentRepository
+    public class StudentRepository : RepositoryBase<Student>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StudentRepository"/> class.
+        /// Конструктор репозитория студентов.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public StudentRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a new student.
+        /// Добавление нового студента.
         /// </summary>
-        /// <param name="student">The student to add.</param>
-        public void Create(Student student)
+        /// <param name="student">Студент для добавления.</param>
+        public override void Create(Student student)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the student to the context.
                 db.Students.Add(student);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all students.
+        /// Получение списка всех студентов.
         /// </summary>
-        /// <returns>List of students.</returns>
-        public List<Student> GetAll()
+        /// <returns>Список студентов.</returns>
+        public override List<Student> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all students as a list.
                 return new List<Student>(db.Students);
             }
         }
 
         /// <summary>
-        /// Updates an existing student.
+        /// Обновление существующего студента.
         /// </summary>
-        /// <param name="student">The student to update.</param>
-        public void Update(Student student)
+        /// <param name="student">Студент для обновления.</param>
+        public override void Update(Student student)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the student in the context.
                 db.Students.Update(student);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a student by its identifier.
+        /// Удаление студента по идентификатору.
         /// </summary>
-        /// <param name="studentId">The student identifier.</param>
-        public void Delete(Guid studentId)
+        /// <param name="studentId">Идентификатор студента.</param>
+        public override void Delete(Guid studentId, Guid id2=default)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the student by ID.
                 var student = db.Students.Find(studentId);
-
-                // If the student exists, remove it.
                 if (student != null)
                 {
                     db.Students.Remove(student);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Строковое представление студента.
+        /// </summary>
+        /// <param name="student">Студент.</param>
+        /// <returns>Строка с параметрами студента.</returns>
+        public override string ToString(Student student)
+        {
+            string birthDate = student.BirthDate.HasValue ? student.BirthDate.Value.ToShortDateString() : "";
+            string gpa = student.GPA.HasValue ? student.GPA.Value.ToString("0.00") : "";
+            return $"{student.StudentID}\t{student.FullName}\t{birthDate}\t{gpa}\t{student.GroupID}\t{(student.IsActive ? "Активен" : "Неактивен")}";
+        }
+
+        /// <summary>
+        /// Вывод всех студентов в консоль.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("StudentID\tFullName\tBirthDate\tGPA\tGroupID\t\t\t\tСтатус");
+            foreach (var student in list)
+            {
+                Console.WriteLine(ToString(student));
             }
         }
     }

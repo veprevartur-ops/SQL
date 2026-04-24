@@ -3,38 +3,47 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents a student.
+    /// Студент.
     /// </summary>
-    public class Student
+    public class Student : IUpdateble<Student>
     {
         /// <summary>
-        /// Gets or sets the unique student identifier.
+        /// Уникальный идентификатор студента.
         /// </summary>
         public Guid StudentID { get; set; }
 
         /// <summary>
-        /// Gets or sets the full name of the student.
+        /// ФИО студента.
         /// </summary>
         public string FullName { get; set; }
 
         /// <summary>
-        /// Gets or sets the birth date of the student.
+        /// Дата рождения.
         /// </summary>
         public DateTime? BirthDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the GPA of the student.
+        /// Средний балл.
         /// </summary>
         public decimal? GPA { get; set; }
 
         /// <summary>
-        /// Gets or sets the group identifier.
+        /// Идентификатор группы.
         /// </summary>
         public Guid GroupID { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the student is active.
+        /// Признак активности.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление ФИО студента.
+        /// </summary>
+        /// <param name="entity">Студент со старым ФИО.</param>
+        public void Update(Student entity)
+        {
+            FullName += " Updated";
+        }
     }
 }

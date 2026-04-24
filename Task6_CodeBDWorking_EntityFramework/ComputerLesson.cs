@@ -3,23 +3,32 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents the use of a computer during a lesson.
+    /// Использование компьютера на занятии.
     /// </summary>
-    public class ComputerLesson
+    public class ComputerLesson : IUpdateble<ComputerLesson>
     {
         /// <summary>
-        /// Gets or sets the computer identifier.
+        /// Идентификатор компьютера.
         /// </summary>
         public Guid ComputerID { get; set; }
 
         /// <summary>
-        /// Gets or sets the lesson identifier.
+        /// Идентификатор занятия.
         /// </summary>
         public Guid LessonID { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the computer was used.
+        /// Признак использования.
         /// </summary>
         public bool? IsUsed { get; set; }
+
+        /// <summary>
+        /// Обновление признака использования.
+        /// </summary>
+        /// <param name="entity">Урок со старыми данными об использовании.</param>
+        public void Update(ComputerLesson entity)
+        {
+            IsUsed = !(IsUsed ?? false);
+        }
     }
 }

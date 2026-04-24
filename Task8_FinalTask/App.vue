@@ -21,7 +21,6 @@
           <strong>{{ cat.name }}</strong> ({{ cat.monthlyBudget }} руб.)
           <span v-if="cat.isActive" style="color:green;">[Активна]</span>
           <span v-else style="color:gray;">[Неактивна]</span>
-          <button @click="viewCategory(cat.id)">Посмотреть</button>
           <button @click="editCategory(cat)">Редактировать</button>
           <button @click="deleteCategory(cat.id)">Удалить</button>
         </li>
@@ -58,7 +57,6 @@
           <strong>{{ item.name }}</strong> ({{ getCategoryName(item.categoryId) }})
           <span v-if="item.isActive" style="color:green;">[Активна]</span>
           <span v-else style="color:gray;">[Неактивна]</span>
-          <button @click="viewItem(item.id)">Посмотреть</button>
           <button @click="editItem(item)">Редактировать</button>
           <button @click="deleteItem(item.id)">Удалить</button>
         </li>
@@ -101,6 +99,9 @@
       </div>
       <div v-if="showDay">
         <input type="date" v-model="selectedDate" @change="fetchByDay" />
+        <div v-if="daySticker" style="margin-top:10px; font-weight:bold;">
+          {{ daySticker }}
+        </div>
       </div>
       <div v-if="showMonth">
         <input type="number" v-model="selectedYear" min="2000" max="2100" placeholder="Год" @change="fetchByMonth" />
@@ -110,7 +111,6 @@
         <li v-for="t in transactions" :key="t.id">
           <strong>{{ t.date.slice(0, 10) }}</strong>: {{ t.amount }} руб. ({{ getItemName(t.expenseItemId) }})
           <span v-if="t.comment">— {{ t.comment }}</span>
-          <button @click="viewTransaction(t.id)">Детали</button>
           <button @click="editTransaction(t)">Редактировать</button>
           <button @click="deleteTransaction(t.id)">Удалить</button>
         </li>
@@ -124,9 +124,17 @@
           <input v-model="editingTransaction.date" type="date" required>
           <input v-model.number="editingTransaction.amount" type="number" placeholder="Сумма" required>
           <input v-model="editingTransaction.comment" placeholder="Комментарий">
-          <select v-model.number="editingTransaction.expenseItemId" required>
+          <select
+            v-model.number="editingTransaction.expenseItemId"
+            :disabled="!getItemById(editingTransaction.expenseItemId)?.isActive"
+            required
+          >
             <option disabled value="">Выберите статью</option>
-            <option v-for="item in activeItems" :key="item.id" :value="item.id">{{ item.name }}</option>
+            <option
+              v-for="item in selectableItems"
+              :key="item.id"
+              :value="item.id"
+            >{{ item.name }}</option>
           </select>
           <button type="submit">Сохранить</button>
           <button @click="cancelEditTransaction" type="button">Отмена</button>
@@ -138,10 +146,10 @@
 
 <script>
 import {
-  getCategories, getCategoryById, createCategory, updateCategory, deleteCategory,
-  getItems, getItemById, createItem, updateItem, deleteItem,
-  getTransactions, getTransactionById, createTransaction, updateTransaction, deleteTransaction,
-  getTransactionsByDay, getTransactionsByMonth
+  getCategories, createCategory, updateCategory, deleteCategory,
+  getItems, createItem, updateItem, deleteItem,
+  getTransactions, createTransaction, updateTransaction, deleteTransaction,
+  getTransactionsByDay, getTransactionsByMonth, getDaySticker
 } from './api.js'
 
 export default {
@@ -161,16 +169,25 @@ export default {
       showMonth: false,
       selectedDate: '',
       selectedYear: new Date().getFullYear(),
-      selectedMonth: new Date().getMonth() + 1
+      selectedMonth: new Date().getMonth() + 1,
+      daySticker: ''
     }
   },
   computed: {
     activeItems() {
       return this.items.filter(item => item.isActive);
+    },
+    selectableItems() {
+      // Для редактирования: только активные или выбраная неактивная
+      if (!this.editingTransaction) {
+        return this.items.filter(i => i.isActive);
+      }
+      return this.items.filter(
+        i => i.isActive || i.id === this.editingTransaction.expenseItemId
+      );
     }
   },
   methods: {
-    // Категории
     refreshCategories() {
       getCategories().then(res => this.categories = res.data);
     },
@@ -195,13 +212,7 @@ export default {
     deleteCategory(id) {
       deleteCategory(id).then(this.refreshCategories);
     },
-    viewCategory(id) {
-      getCategoryById(id).then(res => {
-        alert(`Категория: ${res.data.name}\nБюджет: ${res.data.monthlyBudget}\nАктивна: ${res.data.isActive ? 'Да' : 'Нет'}`);
-      });
-    },
 
-    // Статьи
     refreshItems() {
       getItems().then(res => this.items = res.data);
     },
@@ -226,26 +237,33 @@ export default {
     deleteItem(id) {
       deleteItem(id).then(this.refreshItems);
     },
-    viewItem(id) {
-      getItemById(id).then(res => {
-        alert(`Статья: ${res.data.name}\nКатегория: ${this.getCategoryName(res.data.categoryId)}\nАктивна: ${res.data.isActive ? 'Да' : 'Нет'}`);
-      });
-    },
     getCategoryName(id) {
       const cat = this.categories.find(c => c.id === id);
       return cat ? cat.name : '';
     },
 
-    // Транзакции
     refreshTransactions() {
       getTransactions().then(res => this.transactions = res.data);
     },
+
+    // ТЕХНИЧЕСКОЕ ОГРАНИЧЕНИЕ по СУММЕ ЗА ДЕНЬ
     addTransaction() {
+      const dateStr = this.isoDate(this.newTransaction.date);
+      const sumForDay = this.transactions
+        .filter(t => (t.date && t.date.slice(0, 10)) === dateStr)
+        .reduce((sum, t) => sum + Number(t.amount), 0);
+
+      const newTotal = sumForDay + Number(this.newTransaction.amount);
+      if (newTotal > 1000000) {
+        alert('Нельзя добавить: суммарная сумма транзакций за день превышает 1 000 000 рублей!');
+        return;
+      }
       createTransaction(this.newTransaction).then(() => {
         this.refreshTransactions();
         this.newTransaction = { date: '', amount: 0, comment: '', expenseItemId: '' };
       });
     },
+
     editTransaction(t) {
       this.editingTransaction = { ...t };
     },
@@ -261,28 +279,48 @@ export default {
     deleteTransaction(id) {
       deleteTransaction(id).then(this.refreshTransactions);
     },
-    viewTransaction(id) {
-      getTransactionById(id).then(res => {
-        alert(`Дата: ${res.data.date.slice(0,10)}\nСумма: ${res.data.amount}\nКомментарий: ${res.data.comment}\nСтатья: ${this.getItemName(res.data.expenseItemId)}`);
-      });
-    },
+
     getItemName(id) {
       const item = this.items.find(i => i.id === id);
       return item ? item.name : '';
     },
-    // Фильтрация транзакций
+    getItemById(id) {
+      return this.items.find(i => i.id === id);
+    },
+
     showAll() {
       this.showDay = false;
       this.showMonth = false;
       this.refreshTransactions();
     },
     fetchByDay() {
-      if (this.selectedDate)
-        getTransactionsByDay(this.selectedDate).then(res => this.transactions = res.data);
+      if (!this.selectedDate) return;
+      let dateStr = this.selectedDate;
+      if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateStr)) {
+        const [d, m, y] = dateStr.split('.');
+        dateStr = `${y}-${m}-${d}`;
+      }
+      getTransactionsByDay(dateStr).then(res => this.transactions = res.data);
+      getDaySticker(dateStr)
+        .then(res => {
+          this.daySticker = res.data;
+        })
+        .catch(() => {
+          this.daySticker = '';
+        });
     },
     fetchByMonth() {
       if (this.selectedYear && this.selectedMonth)
         getTransactionsByMonth(this.selectedYear, this.selectedMonth).then(res => this.transactions = res.data);
+    },
+    isoDate(str) {
+      if (!str) return '';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+      if (/^\d{2}\.\d{2}\.\d{4}$/.test(str)) {
+        const [d, m, y] = str.split('.');
+        return `${y}-${m}-${d}`;
+      }
+      return str;
     }
   },
   mounted() {
@@ -346,5 +384,8 @@ ul {
 }
 li {
   margin-bottom: 8px;
+}
+.filters {
+  margin-bottom: 10px;
 }
 </style>

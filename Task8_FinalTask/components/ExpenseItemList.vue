@@ -15,24 +15,40 @@
         <strong>{{ item.name }}</strong> ({{ getCategoryName(item.categoryId) }})
         <span v-if="item.isActive" style="color:green;">[Активна]</span>
         <span v-else style="color:gray;">[Неактивна]</span>
+        <!-- Убрано: <button @click="viewItem(item.id)">Посмотреть</button> -->
+        <button @click="editItem(item)">Редактировать</button>
         <button @click="deleteItem(item.id)">Удалить</button>
       </li>
     </ul>
     <div v-if="items.length === 0">
       Нет статей для отображения.
     </div>
+    <div v-if="editingItem">
+      <h3>Редактировать статью</h3>
+      <form @submit.prevent="updateItem">
+        <input v-model="editingItem.name" placeholder="Название" required>
+        <select v-model.number="editingItem.categoryId" required>
+          <option disabled value="">Выберите категорию</option>
+          <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+        </select>
+        <label><input type="checkbox" v-model="editingItem.isActive"> Активна</label>
+        <button type="submit">Сохранить</button>
+        <button @click="cancelEditItem" type="button">Отмена</button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script>
-import { getItems, createItem, deleteItem, getCategories } from '../api.js'
+import { getItems, createItem, deleteItem, updateItem, getCategories } from '../api.js'
 
 export default {
   data() {
     return {
       items: [],
       categories: [],
-      newItem: { name: '', categoryId: '', isActive: true }
+      newItem: { name: '', categoryId: '', isActive: true },
+      editingItem: null
     }
   },
   methods: {
@@ -45,6 +61,18 @@ export default {
         this.refresh();
         this.newItem = { name: '', categoryId: '', isActive: true };
       });
+    },
+    editItem(item) {
+      this.editingItem = { ...item };
+    },
+    updateItem() {
+      updateItem(this.editingItem.id, this.editingItem).then(() => {
+        this.refresh();
+        this.editingItem = null;
+      });
+    },
+    cancelEditItem() {
+      this.editingItem = null;
     },
     deleteItem(id) {
       deleteItem(id).then(this.refresh);

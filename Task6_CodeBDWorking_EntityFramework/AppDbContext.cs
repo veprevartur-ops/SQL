@@ -3,73 +3,73 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// The EF Core database context.
+    /// Контекст базы данных EF Core.
     /// </summary>
     public class AppDbContext : DbContext
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AppDbContext"/> class.
+        /// Конструктор контекста базы данных.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public AppDbContext(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Gets or sets the groups table.
+        /// Таблица групп.
         /// </summary>
         public DbSet<Group> Groups { get; set; }
 
         /// <summary>
-        /// Gets or sets the students table.
+        /// Таблица студентов.
         /// </summary>
         public DbSet<Student> Students { get; set; }
 
         /// <summary>
-        /// Gets or sets the classrooms table.
+        /// Таблица кабинетов.
         /// </summary>
         public DbSet<Classroom> Classrooms { get; set; }
 
         /// <summary>
-        /// Gets or sets the computers table.
+        /// Таблица компьютеров.
         /// </summary>
         public DbSet<Computer> Computers { get; set; }
 
         /// <summary>
-        /// Gets or sets the lessons table.
+        /// Таблица занятий.
         /// </summary>
         public DbSet<Lesson> Lessons { get; set; }
 
         /// <summary>
-        /// Gets or sets the student lessons table.
+        /// Таблица посещений студентами занятий.
         /// </summary>
         public DbSet<StudentLesson> StudentLessons { get; set; }
 
         /// <summary>
-        /// Gets or sets the computer lessons table.
+        /// Таблица использования компьютеров на занятиях.
         /// </summary>
         public DbSet<ComputerLesson> ComputerLessons { get; set; }
 
         /// <summary>
-        /// Configures the database connection.
+        /// Настройка строки подключения к базе данных.
         /// </summary>
-        /// <param name="optionsBuilder">The options builder.</param>
+        /// <param name="optionsBuilder">Построитель параметров.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Set the SQL Server connection string.
+            // Строка подключения к SQL Server.
             optionsBuilder.UseSqlServer(_connectionString);
         }
 
         /// <summary>
-        /// Configures the database model.
+        /// Настройка модели базы данных.
         /// </summary>
-        /// <param name="modelBuilder">The model builder.</param>
+        /// <param name="modelBuilder">Построитель модели.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Configure entity keys and table names.
+            // Настройки ключей и названий таблиц.
             modelBuilder.Entity<Group>().ToTable("Group").HasKey(g => g.GroupID);
             modelBuilder.Entity<Student>().ToTable("Student").HasKey(s => s.StudentID);
             modelBuilder.Entity<Classroom>().ToTable("Classroom").HasKey(c => c.ClassroomID);

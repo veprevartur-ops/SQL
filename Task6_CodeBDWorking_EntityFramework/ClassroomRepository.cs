@@ -4,89 +4,96 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the Classroom table.
+    /// Репозиторий для работы с таблицей кабинетов.
     /// </summary>
-    public class ClassroomRepository
+    public class ClassroomRepository : RepositoryBase<Classroom>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClassroomRepository"/> class.
+        /// Конструктор репозитория кабинетов.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public ClassroomRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a new classroom.
+        /// Добавление нового кабинета.
         /// </summary>
-        /// <param name="classroom">The classroom to add.</param>
-        public void Create(Classroom classroom)
+        /// <param name="classroom">Кабинет для добавления.</param>
+        public override void Create(Classroom classroom)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the classroom to the context.
                 db.Classrooms.Add(classroom);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all classrooms.
+        /// Получение списка всех кабинетов.
         /// </summary>
-        /// <returns>List of classrooms.</returns>
-        public List<Classroom> GetAll()
+        /// <returns>Список кабинетов.</returns>
+        public override List<Classroom> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all classrooms as a list.
                 return new List<Classroom>(db.Classrooms);
             }
         }
 
         /// <summary>
-        /// Updates an existing classroom.
+        /// Обновление существующего кабинета.
         /// </summary>
-        /// <param name="classroom">The classroom to update.</param>
-        public void Update(Classroom classroom)
+        /// <param name="classroom">Кабинет для обновления.</param>
+        public override void Update(Classroom classroom)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the classroom in the context.
                 db.Classrooms.Update(classroom);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a classroom by its identifier.
+        /// Удаление кабинета по идентификатору.
         /// </summary>
-        /// <param name="classroomId">The classroom identifier.</param>
-        public void Delete(Guid classroomId)
+        /// <param name="classroomId">Идентификатор кабинета.</param>
+        public override void Delete(Guid classroomId, Guid id2 = default)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the classroom by ID.
                 var classroom = db.Classrooms.Find(classroomId);
-
-                // If the classroom exists, remove it.
                 if (classroom != null)
                 {
                     db.Classrooms.Remove(classroom);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Получение строкового представления кабинета.
+        /// </summary>
+        /// <param name="classroom">Кабинет.</param>
+        /// <returns>Строковое представление кабинета.</returns>
+        public override string ToString(Classroom classroom)
+        {
+            return $"{classroom.ClassroomID}\t{classroom.RoomName}\t{classroom.Capacity}\t{(classroom.IsActive ? "Активен" : "Неактивен")}";
+        }
+
+        /// <summary>
+        /// Вывод всех кабинетов в консоль.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("ClassroomID\tRoomName\tCapacity\tStatus");
+            foreach (var classroom in list)
+            {
+                Console.WriteLine(ToString(classroom));
             }
         }
     }

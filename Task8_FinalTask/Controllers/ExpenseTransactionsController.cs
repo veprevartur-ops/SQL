@@ -1,19 +1,38 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
+/// <summary>
+/// Контроллер транзакций расходов.
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 public class ExpenseTransactionsController : ControllerBase
 {
     private readonly AppDbContext _context;
+
+    /// <summary>
+    /// Конструктор контроллера транзакций расходов.
+    /// </summary>
+    /// <param name="context">Контекст базы данных.</param>
     public ExpenseTransactionsController(AppDbContext context) => _context = context;
 
-    // Получить все транзакции
+    /// <summary>
+    /// Получение списка всех транзакций.
+    /// </summary>
+    /// <returns>Список транзакций расходов.</returns>
     [HttpGet]
     public async Task<IEnumerable<ExpenseTransaction>> GetAll() =>
         await _context.Transactions.Include(t => t.ExpenseItem).ToListAsync();
 
-    // Получить транзакции за день
+    /// <summary>
+    /// Получение списка транзакций за день.
+    /// </summary>
+    /// <param name="date">Дата выборки.</param>
+    /// <returns>Список транзакций за указанный день.</returns>
     [HttpGet("byday/{date}")]
     public async Task<IEnumerable<ExpenseTransaction>> GetByDay(DateTime date) =>
         await _context.Transactions
@@ -21,7 +40,12 @@ public class ExpenseTransactionsController : ControllerBase
             .Include(t => t.ExpenseItem)
             .ToListAsync();
 
-    // Получить транзакции за месяц
+    /// <summary>
+    /// Получение списка транзакций за месяц.
+    /// </summary>
+    /// <param name="year">Год выборки.</param>
+    /// <param name="month">Месяц выборки.</param>
+    /// <returns>Список транзакций за указанный месяц.</returns>
     [HttpGet("bymonth/{year}/{month}")]
     public async Task<IEnumerable<ExpenseTransaction>> GetByMonth(int year, int month) =>
         await _context.Transactions
@@ -29,12 +53,20 @@ public class ExpenseTransactionsController : ControllerBase
             .Include(t => t.ExpenseItem)
             .ToListAsync();
 
-    // Визуализация по дню
+    /// <summary>
+    /// Визуализация расходов за день.
+    /// </summary>
+    /// <param name="date">Дата анализа.</param>
+    /// <returns>Текстовая оценка расходов за день.</returns>
     [HttpGet("sticker/{date}")]
-    public async Task<string> GetDaySticker(DateTime date)
+    public async Task<string> GetDaySticker(string date)
     {
+        // Преобразование вручную
+        if (!DateTime.TryParse(date, out var parsedDate))
+            return "Ошибка: неверный формат даты! Ожидается yyyy-MM-dd";
+
         var sum = await _context.Transactions
-            .Where(t => t.Date.Date == date.Date)
+            .Where(t => t.Date.Date == parsedDate.Date)
             .SumAsync(t => t.Amount);
 
         if (sum < 500)
@@ -45,11 +77,14 @@ public class ExpenseTransactionsController : ControllerBase
             return "🟥 День был затратным!";
     }
 
-    // Создать транзакцию
+    /// <summary>
+    /// Создание новой транзакции.
+    /// </summary>
+    /// <param name="transaction">Данные новой транзакции.</param>
+    /// <returns>Результат создания транзакции.</returns>
     [HttpPost]
     public async Task<IActionResult> Create(ExpenseTransaction transaction)
     {
-        // Ограничение: не более 1 000 000 руб. за день
         var sumForDay = await _context.Transactions
             .Where(t => t.Date == transaction.Date)
             .SumAsync(t => t.Amount);
@@ -57,7 +92,6 @@ public class ExpenseTransactionsController : ControllerBase
         if (sumForDay + transaction.Amount > 1_000_000m)
             return BadRequest("Суммарная сумма транзакций за день превышает 1 000 000 рублей!");
 
-        // Проверка активности статьи
         var item = await _context.Items.FindAsync(transaction.ExpenseItemId);
         if (item == null || !item.IsActive)
             return BadRequest("Статья расхода неактивна или не найдена!");
@@ -67,22 +101,30 @@ public class ExpenseTransactionsController : ControllerBase
         return Ok(transaction);
     }
 
-    // Обновить транзакцию
+    /// <summary>
+    /// Обновление транзакции.
+    /// </summary>
+    /// <param name="id">Идентификатор транзакции.</param>
+    /// <param name="transaction">Новые данные транзакции.</param>
+    /// <returns>Результат обновления транзакции.</returns>
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, ExpenseTransaction transaction)
     {
         if (id != transaction.Id) return BadRequest();
 
-        var existing = await _context.Transactions.Include(t => t.ExpenseItem).FirstOrDefaultAsync(t => t.Id == id);
+        var existing = await _context.Transactions
+            .Include(t => t.ExpenseItem)
+            .FirstOrDefaultAsync(t => t.Id == id);
+
         if (existing == null) return NotFound();
 
-        // Если статья расхода неактивна, запретить изменение ExpenseItemId
         if (!existing.ExpenseItem.IsActive && transaction.ExpenseItemId != existing.ExpenseItemId)
             return BadRequest("Нельзя изменить статью расхода, если она неактивна.");
 
         existing.Date = transaction.Date;
         existing.Amount = transaction.Amount;
         existing.Comment = transaction.Comment;
+
         if (existing.ExpenseItem.IsActive)
             existing.ExpenseItemId = transaction.ExpenseItemId;
 
@@ -90,7 +132,11 @@ public class ExpenseTransactionsController : ControllerBase
         return NoContent();
     }
 
-    // Удалить транзакцию
+    /// <summary>
+    /// Удаление транзакции.
+    /// </summary>
+    /// <param name="id">Идентификатор транзакции.</param>
+    /// <returns>Результат удаления транзакции.</returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

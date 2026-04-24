@@ -4,90 +4,97 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the ComputerLesson table.
+    /// Репозиторий для работы с таблицей использования компьютера на занятии.
     /// </summary>
-    public class ComputerLessonRepository
+    public class ComputerLessonRepository : RepositoryBase<ComputerLesson>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ComputerLessonRepository"/> class.
+        /// Конструктор репозитория использования компьютера на занятии.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public ComputerLessonRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a computer usage at a lesson.
+        /// Добавление использования компьютера на занятии.
         /// </summary>
-        /// <param name="cl">The computer lesson to add.</param>
-        public void Create(ComputerLesson cl)
+        /// <param name="cl">Экземпляр использования для добавления.</param>
+        public override void Create(ComputerLesson cl)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the computer lesson to the context.
                 db.ComputerLessons.Add(cl);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all computer lessons.
+        /// Получение списка всех использований компьютеров на занятиях.
         /// </summary>
-        /// <returns>List of computer lessons.</returns>
-        public List<ComputerLesson> GetAll()
+        /// <returns>Список использований.</returns>
+        public override List<ComputerLesson> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all computer lessons as a list.
                 return new List<ComputerLesson>(db.ComputerLessons);
             }
         }
 
         /// <summary>
-        /// Updates an existing computer lesson.
+        /// Обновление использования компьютера на занятии.
         /// </summary>
-        /// <param name="cl">The computer lesson to update.</param>
-        public void Update(ComputerLesson cl)
+        /// <param name="cl">Экземпляр использования для обновления.</param>
+        public override void Update(ComputerLesson cl)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the computer lesson in the context.
                 db.ComputerLessons.Update(cl);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a computer lesson by computer and lesson identifiers.
+        /// Удаление использования компьютера на занятии по идентификаторам.
         /// </summary>
-        /// <param name="computerId">The computer identifier.</param>
-        /// <param name="lessonId">The lesson identifier.</param>
-        public void Delete(Guid computerId, Guid lessonId)
+        /// <param name="computerId">Идентификатор компьютера.</param>
+        /// <param name="lessonId">Идентификатор занятия.</param>
+        public override void Delete(Guid computerId, Guid lessonId)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the computer lesson by IDs.
                 var cl = db.ComputerLessons.Find(computerId, lessonId);
-
-                // If the computer lesson exists, remove it.
                 if (cl != null)
                 {
                     db.ComputerLessons.Remove(cl);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Строковое представление использования компьютера на занятии.
+        /// </summary>
+        /// <param name="cl">Использование компьютера на занятии.</param>
+        /// <returns>Строка с описанием.</returns>
+        public override string ToString(ComputerLesson cl)
+        {
+            return $"{cl.ComputerID}\t{cl.LessonID}\t{(cl.IsUsed.HasValue ? (cl.IsUsed.Value ? "Использовался" : "Не использовался") : "Нет данных")}";
+        }
+
+        /// <summary>
+        /// Вывод всех использований компьютера на занятиях в консоль.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("ComputerID\t\t\tLessonID\t\t\tСтатус использования");
+            foreach (var cl in list)
+            {
+                Console.WriteLine(ToString(cl));
             }
         }
     }

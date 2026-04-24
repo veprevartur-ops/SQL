@@ -3,43 +3,52 @@
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Represents a computer.
+    /// Компьютер.
     /// </summary>
-    public class Computer
+    public class Computer : IUpdateble<Computer>
     {
         /// <summary>
-        /// Gets or sets the unique computer identifier.
+        /// Уникальный идентификатор компьютера.
         /// </summary>
         public Guid ComputerID { get; set; }
 
         /// <summary>
-        /// Gets or sets the inventory number.
+        /// Инвентарный номер.
         /// </summary>
         public string InventoryNumber { get; set; }
 
         /// <summary>
-        /// Gets or sets the brand of the computer.
+        /// Бренд компьютера.
         /// </summary>
         public string Brand { get; set; }
 
         /// <summary>
-        /// Gets or sets the purchase date.
+        /// Дата покупки.
         /// </summary>
         public DateTime? PurchaseDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the price.
+        /// Цена.
         /// </summary>
         public decimal? Price { get; set; }
 
         /// <summary>
-        /// Gets or sets the classroom identifier.
+        /// Идентификатор класса.
         /// </summary>
         public Guid ClassroomID { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the computer is active.
+        /// Признак активности.
         /// </summary>
         public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Обновление бренда компьютера.
+        /// </summary>
+        /// <param name="entity">Компьютер со старым брендом.</param>
+        public void Update(Computer entity)
+        {
+            Brand += " Updated";
+        }
     }
 }

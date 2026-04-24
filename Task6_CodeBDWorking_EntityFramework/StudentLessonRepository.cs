@@ -4,90 +4,99 @@ using System.Collections.Generic;
 namespace EntityFramework_Database
 {
     /// <summary>
-    /// Repository for working with the StudentLesson table.
+    /// Репозиторий для работы с таблицей посещений занятий студентами.
     /// </summary>
-    public class StudentLessonRepository
+    public class StudentLessonRepository : RepositoryBase<StudentLesson>
     {
         private readonly string _connectionString;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StudentLessonRepository"/> class.
+        /// Конструктор репозитория посещений занятий студентами.
         /// </summary>
-        /// <param name="connectionString">The database connection string.</param>
+        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public StudentLessonRepository(string connectionString)
         {
             _connectionString = connectionString;
         }
 
         /// <summary>
-        /// Adds a student's attendance at a lesson.
+        /// Добавление посещения студентом занятия.
         /// </summary>
-        /// <param name="sl">The student lesson to add.</param>
-        public void Create(StudentLesson sl)
+        /// <param name="sl">Посещение для добавления.</param>
+        public override void Create(StudentLesson sl)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Add the student lesson to the context.
                 db.StudentLessons.Add(sl);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Gets all student lessons.
+        /// Получение списка всех посещений занятий студентами.
         /// </summary>
-        /// <returns>List of student lessons.</returns>
-        public List<StudentLesson> GetAll()
+        /// <returns>Список посещений.</returns>
+        public override List<StudentLesson> GetAll()
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Return all student lessons as a list.
                 return new List<StudentLesson>(db.StudentLessons);
             }
         }
 
         /// <summary>
-        /// Updates an existing student lesson.
+        /// Обновление информации о посещении.
         /// </summary>
-        /// <param name="sl">The student lesson to update.</param>
-        public void Update(StudentLesson sl)
+        /// <param name="sl">Посещение для обновления.</param>
+        public override void Update(StudentLesson sl)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Update the student lesson in the context.
                 db.StudentLessons.Update(sl);
-
-                // Save changes to the database.
                 db.SaveChanges();
             }
         }
 
         /// <summary>
-        /// Deletes a student lesson by student and lesson identifiers.
+        /// Удаление посещения по идентификаторам студента и занятия.
         /// </summary>
-        /// <param name="studentId">The student identifier.</param>
-        /// <param name="lessonId">The lesson identifier.</param>
-        public void Delete(Guid studentId, Guid lessonId)
+        /// <param name="studentId">Идентификатор студента.</param>
+        /// <param name="lessonId">Идентификатор занятия.</param>
+        public override void Delete(Guid studentId, Guid lessonId)
         {
-            // Create a new database context.
             using (var db = new AppDbContext(_connectionString))
             {
-                // Find the student lesson by IDs.
                 var sl = db.StudentLessons.Find(studentId, lessonId);
-
-                // If the student lesson exists, remove it.
                 if (sl != null)
                 {
                     db.StudentLessons.Remove(sl);
-
-                    // Save changes to the database.
                     db.SaveChanges();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Строковое представление посещения занятия студентом.
+        /// </summary>
+        /// <param name="sl">Экземпляр посещения.</param>
+        /// <returns>Строка с параметрами посещения.</returns>
+        public override string ToString(StudentLesson sl)
+        {
+            string mark = sl.Mark.HasValue ? sl.Mark.Value.ToString("0.00") : "";
+            string isPresent = sl.IsPresent.HasValue ? (sl.IsPresent.Value ? "Присутствовал" : "Отсутствовал") : "Нет данных";
+            return $"{sl.StudentID}\t{sl.LessonID}\t{mark}\t{isPresent}";
+        }
+
+        /// <summary>
+        /// Вывод всех посещений занятий в консоль.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var list = GetAll();
+            Console.WriteLine("StudentID\t\t\tLessonID\t\t\tОценка\tПосещение");
+            foreach (var sl in list)
+            {
+                Console.WriteLine(ToString(sl));
             }
         }
     }

@@ -11,16 +11,8 @@ namespace ConsoleAdoDatabase
     {
         private readonly string _connectionString;
 
-        /// <summary>
-        /// Создаёт новый экземпляр репозитория классов.
-        /// </summary>
-        /// <param name="connectionString">Строка подключения к базе данных.</param>
         public ClassroomRepository(string connectionString) => _connectionString = connectionString;
 
-        /// <summary>
-        /// Добавляет новый класс в базу данных.
-        /// </summary>
-        /// <param name="classroom">Класс для добавления.</param>
         public override void Create(Classroom classroom)
         {
             using (var conn = new SqlConnection(_connectionString))
@@ -53,7 +45,7 @@ namespace ConsoleAdoDatabase
         }
 
         /// <summary>
-        /// Получает список всех классов и печатает их содержимое.
+        /// Получает список всех классов.
         /// </summary>
         /// <returns>Список классов.</returns>
         public override List<Classroom> GetAll()
@@ -66,7 +58,6 @@ namespace ConsoleAdoDatabase
                     "SELECT ClassroomID, RoomName, Capacity, IsActive FROM Classroom", conn))
                 using (var reader = cmd.ExecuteReader())
                 {
-                    Console.WriteLine("ClassroomID\tRoomName\tCapacity\tIsActive");
                     while (reader.Read())
                     {
                         var classroom = new Classroom
@@ -79,28 +70,17 @@ namespace ConsoleAdoDatabase
                             IsActive = (bool)reader["IsActive"]
                         };
                         classrooms.Add(classroom);
-
-                        // Печать содержимого строки
-                        Console.WriteLine($"{classroom.ClassroomID}\t{classroom.RoomName}\t{classroom.Capacity}\t{classroom.IsActive}");
-                        Console.WriteLine();
                     }
                 }
             }
             return classrooms;
         }
 
-        /// <summary>
-        /// Обновляет данные класса.
-        /// </summary>
-        /// <param name="classroom">Класс для обновления.</param>
         public override void Update(Classroom classroom)
         {
-            // Открываем соединение с базой данных.
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                // Готовим SQL-команду для обновления класса.
                 using (var cmd = new SqlCommand(
                     "UPDATE Classroom " +
                     "SET RoomName = @RoomName, Capacity = @Capacity, IsActive = @IsActive " +
@@ -111,7 +91,6 @@ namespace ConsoleAdoDatabase
                     cmd.Parameters.AddWithValue("@Capacity", (object)classroom.Capacity ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@IsActive", classroom.IsActive);
 
-                    // Выполняем команду.
                     try
                     {
                         cmd.ExecuteNonQuery();
@@ -128,31 +107,44 @@ namespace ConsoleAdoDatabase
             }
         }
 
-        /// <summary>
-        /// Удаляет класс по идентификатору.
-        /// </summary>
-        /// <param name="classroomId">Идентификатор класса.</param>
         public override void Delete(Guid classroomId, Guid id2 = default)
         {
-            // Открываем соединение с базой данных.
             using (var conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-
-                // Готовим SQL-команду для удаления класса.
                 using (var cmd = new SqlCommand(
                     "DELETE FROM Classroom " +
                     "WHERE ClassroomID = @ClassroomID", conn))
                 {
                     cmd.Parameters.AddWithValue("@ClassroomID", classroomId);
-
-                    // Выполняем команду.
                     int affected = cmd.ExecuteNonQuery();
                     if (affected == 0)
                     {
                         throw new InvalidOperationException("Удаление не выполнено: запись с таким ключом не найдена.");
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Возвращает строковое представление объекта Classroom.
+        /// </summary>
+        /// <param name="classroom">Класс.</param>
+        /// <returns>Строка с данными о классе.</returns>
+        public override string ToString(Classroom classroom)
+        {
+            return $"{classroom.ClassroomID}\t{classroom.RoomName}\t{classroom.Capacity}\t{(classroom.IsActive ? "Активен" : "Неактивен")}";
+        }
+
+        /// <summary>
+        /// Вывод в консоль всех классов из таблицы Classroom.
+        /// </summary>
+        public override void PrintAll()
+        {
+            var classrooms = GetAll();
+            foreach (var classroom in classrooms)
+            {
+                Console.WriteLine(ToString(classroom));
             }
         }
     }
